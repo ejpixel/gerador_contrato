@@ -2,10 +2,6 @@ from docxtpl import DocxTemplate
 from profiles import *
 import sys
 import os
-
-HERE = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.join(HERE, "../"))
-
 from number_to_word.number_to_word import convert_to_word
 
 TEMPLATE = "template.docx"
