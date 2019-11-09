@@ -1,0 +1,3 @@
+[submodule "number_to_word"]
+	path = number_to_word
+	url = https://github.com/gorgonun/numero-por-extenso

@@ -1,0 +1,89 @@
+{% extends "layout.html" %}
+{% block title%}
+Gerador contrato
+{% endblock %}
+
+{% block main %}
+    <form action="/generate" method="POST">
+        
+        <h1>Cliente</h1>
+
+        <div class="form-group">
+            <label for="client_store_name">Nome da loja</label>
+            <input type="text" name="client_store_name" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="client_address">Endereço</label>
+            <input type="text" name="client_address" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label for="client_cnpj">CNPJ</label>
+            <input type="text" name="client_cnpj" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="client_name">Nome do cliente</label>
+            <input type="text" name="client_name" class="form-control" required>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="client_rg">RG</label>
+                <input type="text" name="client_rg" class="form-control" required>
+            </div>
+            
+            <div class="form-group col-md-6">
+                <label for="client_cpf">CPF</label>
+                <input type="text" name="client_cpf" class="form-control" required>
+            </div>
+        </div>
+
+        <h1>Serviço</h1>
+
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="type_contract" class="text-nowrap">Tipo de contrato</label>
+                <select name="type_contract" class="form-control">
+                    <option>Desenvolvimento</option>
+                    <option>Migração</option>
+                </select>
+            </div>
+
+            <div class="form-group col-md-6">
+                <label for="deadline" class="text-nowrap">Dias (úteis) para entrega</label>
+                <input name="deadline" type="number" class="form-control" required>
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                <label for="price">Preço total</label>
+                <input name="price" type="number" min="0" class="form-control" required>
+            </div>
+
+            <div class="form-group col-md-4">
+                <label for="payment" class="text-nowrap">Em</label>
+                <input name="payment" type="number" min="1" class="form-control" required>
+            </div>
+
+            <div class="form-group col-md-4">
+                <label for="payment" class="text-nowrap">Parcelas de</label>
+                <input name="payment_price" type="number" min="1" class="form-control" required>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="short_description">Descrição curta da atividade</label>
+            <input name="short_description" type="text" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label for="short_service_list">Lista de serviços</label>
+            <textarea name="short_service_list" id="" cols="30" rows="10" class="form-control" required></textarea>
+        </div>
+
+        <input type="submit" value="Gerar contrato">
+    </form>
+{% endblock %}
