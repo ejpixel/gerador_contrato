@@ -21,7 +21,7 @@ def gen_info(service, client, ej):
         "price_currency":            get_correct_number_flexion(service.price, "real", "reais"),
         "cursive_payment":           get_fem_gender_flexion(convert_to_word(service.payment)),
         "payment_price":             service.payment_price,
-        "cursive_payment_price":     convert_to_word(service.payment_price),
+        "cursive_payment_price":     convert_float(service.payment_price),
         "payment_currency":          get_correct_number_flexion(service.payment_price, "real", "reais"),
         "service_list":              service.service_list,
         "client_store_name":         client.store.name.upper(),
@@ -39,6 +39,16 @@ def gen_info(service, client, ej):
         "pixel_gi_cpf":              ej.gi.get_formated_cpf()
 }
     return contract_info
+
+def convert_float(price):
+    print(price)
+    number_as_list = str(price).split(",")
+    if len(number_as_list) == 2:
+        before_comma = convert_to_word(int(number_as_list[0]))
+        after_comma = convert_to_word(int(number_as_list[1]))
+        if after_comma != 0:
+            return f"({number_as_list[0]}) {get_correct_number_flexion(int(number_as_list[0]), 'real', 'reais')} e ({number_as_list[1]}) centavos"
+    return f"({convert_to_word(int(number_as_list[0]))}) {get_correct_number_flexion(int(number_as_list[0]), 'real', 'reais')}"
 
 def format_date(date_iso_format):
     date_list = str(date_iso_format).split("-")
