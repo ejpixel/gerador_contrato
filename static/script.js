@@ -26,8 +26,9 @@ $(document).ready(function() {
     $("#type_client").on("change", clientType);
     $("#payment").on("input", calculatePaymentPrice);
     $("#price").on("input", calculatePaymentPrice);
-    $("#generate_contract").click(function() {
-        $("#payment_price").attr("type", "text");
-        $("#payment_price").val($("#payment_price").val().replace(".", ","));
-    })
 })
+
+// $("#generate_contract").click(function() {
+//     $("#payment_price").attr("type", "text");
+//     $("#payment_price").val($("#payment_price").val().replace(".", ","));
+// })

@@ -41,14 +41,13 @@ def gen_info(service, client, ej):
     return contract_info
 
 def convert_float(price):
-    print(price)
-    number_as_list = str(price).split(",")
+    number_as_list = str(price).split(".")
     if len(number_as_list) == 2:
         before_comma = convert_to_word(int(number_as_list[0]))
         after_comma = convert_to_word(int(number_as_list[1]))
         if after_comma != 0:
-            return f"({number_as_list[0]}) {get_correct_number_flexion(int(number_as_list[0]), 'real', 'reais')} e ({number_as_list[1]}) centavos"
-    return f"({convert_to_word(int(number_as_list[0]))}) {get_correct_number_flexion(int(number_as_list[0]), 'real', 'reais')}"
+            return f"{number_as_list[0]} ({before_comma}) {get_correct_number_flexion(number_as_list[0], 'real', 'reais')} e {number_as_list[1]} ({after_comma}) {get_correct_number_flexion(number_as_list[1], 'centavo', 'centavos')}"
+    return f"{before_comma} ({convert_to_word(int(number_as_list[0]))}) {get_correct_number_flexion(number_as_list[0], 'real', 'reais')}"
 
 def format_date(date_iso_format):
     date_list = str(date_iso_format).split("-")
@@ -70,7 +69,7 @@ def format_date(date_iso_format):
     return f"{'primeiro' if date_list[2] == '01' else convert_to_word(date_list[2])} de {months[date_list[1]]} de {date_list[0]}"
 
 def get_correct_number_flexion(number, singular, plural):
-    if number == "1":
+    if number == "1" or number == 1:
         return singular
     return plural
 

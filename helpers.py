@@ -18,6 +18,35 @@ def start_db(db):
         name text not null,
         password text not null
         )
+    ''',
+    '''
+    CREATE TABLE IF NOT EXISTS services (
+        id serial primary key,
+        username text not null,
+        type text not null,
+        days_to_finish integer not null,
+        total_price float not null,
+        payment_price float not null,
+        payment integer not null,
+        description json not null,
+        contract_generation_date date not null default now(),
+        accept boolean,
+        first_payment date
+        )
+    ''',
+    '''
+    CREATE TABLE IF NOT EXISTS clients (
+        id serial primary key,
+        store_name text,
+        address text not null,
+        cep text not null,
+        cnpj text,
+        client_name text not null,
+        rg text not null,
+        cpf text not null,
+        email text not null,
+        service_id integer REFERENCES services(id)
+        )
     '''
     ]
     for command in commands:

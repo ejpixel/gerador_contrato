@@ -6,6 +6,7 @@ from profiles import *
 import gerador_contrato
 import hashlib
 from helpers import *
+import json
 
 app = Flask(__name__)
 
@@ -53,14 +54,20 @@ def generate():
     short_service_list = request.form['short_service_list'].strip().split("\r\n")
     client_store_name = request.form['client_store_name']
     client_address = request.form['client_address']
+    client_cep = request.form['client_cep']
     client_cnpj = request.form['client_cnpj']
     client_name = request.form['client_name']
     client_rg = request.form['client_rg']
     client_cpf = request.form['client_cpf']
+    client_email = request.form['client_email']
     service = Service(type_contract, deadline, short_description, price, payment, payment_price, short_service_list)
     client = Client(client_name, client_store_name, client_rg, client_cpf, client_cnpj, client_address)
     current_ej = db.engine.execute("SELECT * FROM ej ORDER BY ata_date limit 1").first()
     ej = EJ(*current_ej)
     info = gerador_contrato.gen_info(service, client, ej)
     gerador_contrato.gen_contract(gerador_contrato.TEMPLATE, info, gerador_contrato.OUTPUT)
+
+    descriptions = json.dumps({"short_description": short_description, "service_list": short_service_list})
+    id = db.engine.execute('INSERT INTO services("username", "type", "days_to_finish", "total_price", "payment_price", "payment", "description") VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING id', session["user_id"], type_contract, deadline, price, payment_price, payment, descriptions).first()
+    db.engine.execute('INSERT INTO clients("store_name","address","cep","cnpj","client_name","rg","cpf","email","service_id") VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)', client_store_name, client_address, client_cep, client_cnpj, client_name, client_rg, client_cpf, client_email, id[0])
     return redirect("/generate")
