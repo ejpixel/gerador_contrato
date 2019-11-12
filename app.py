@@ -10,7 +10,6 @@ from helpers import *
 app = Flask(__name__)
 
 app.secret_key = os.environ["SECRET_KEY"]
-temp_access_key = os.environ["ACCESS_KEY"]
 
 try:
     app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["DATABASE_URI"]
@@ -19,20 +18,21 @@ except KeyError:
     raise ValueError("É necessário definir variável de ambiente DATABASE_URI com a chave de acesso do banco de dados.")
 
 db = sql(app)
+start_db(db)
 
 @app.route("/access", methods=["GET", "POST"])
 def access():
     if request.method == "POST":
         hash = hashlib.sha256(request.form["key"].encode()).hexdigest()
-        if hash == temp_access_key:
-            session["user_id"] = "pixel"
+        result = db.engine.execute("SELECT * FROM users WHERE password = %s", hash).first()
+        if result:
+            session["user_id"] = result[0]
         return redirect("/")
     return render_template("access.html")
 
 @app.route("/")
 @login_required
 def index():
-    # TODO: FIX THIS GAMBI
     return render_template("index.html")
 
 @app.route("/generate", methods=["GET", "POST"])
