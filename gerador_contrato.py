@@ -43,11 +43,16 @@ def gen_info(service, client, ej):
 def convert_float(price):
     number_as_list = str(price).split(".")
     if len(number_as_list) == 2:
-        before_comma = convert_to_word(int(number_as_list[0]))
-        after_comma = convert_to_word(int(number_as_list[1]))
-        if after_comma != 0:
-            return f"{number_as_list[0]} ({before_comma}) {get_correct_number_flexion(number_as_list[0], 'real', 'reais')} e {number_as_list[1]} ({after_comma}) {get_correct_number_flexion(number_as_list[1], 'centavo', 'centavos')}"
-    return f"{before_comma} ({convert_to_word(int(number_as_list[0]))}) {get_correct_number_flexion(number_as_list[0], 'real', 'reais')}"
+        first_number = int(number_as_list[0])
+        second_number = int(number_as_list[1])
+        before_comma = convert_to_word(first_number)
+        after_comma = convert_to_word(second_number)
+        if second_number != 0:
+            return f"{first_number} ({before_comma}) {get_correct_number_flexion(first_number, 'real', 'reais')} e {second_number} ({after_comma}) {get_correct_number_flexion(second_number, 'centavo', 'centavos')}"
+    else:
+        first_number = int(number_as_list[0])
+        before_comma = convert_to_word(first_number)
+    return f"{first_number} ({before_comma}) {get_correct_number_flexion(first_number, 'real', 'reais')}"
 
 def format_date(date_iso_format):
     date_list = str(date_iso_format).split("-")
