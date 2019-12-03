@@ -68,51 +68,64 @@ def generate():
     gerador_contrato.gen_contract(gerador_contrato.TEMPLATE, info, gerador_contrato.OUTPUT)
 
     descriptions = json.dumps({"short_description": short_description, "service_list": short_service_list})
-    #
-    # client_id = db.engine.execute("SELECT id from clients WHERE store_name=%(store_name)s AND address=%(address)s AND cep=%(cep)s AND cnpj=%(cnpj)s AND client_name=%(name)s AND rg=%(rg)s AND cpf=%(cpf)s AND email=%(email)s", store_name=client_store_name, address=client_address, cep=client_cep, cnpj=client_cnpj, name=client_name, rg=client_rg, cpf=client_cpf, email=client_email).first()
-    # if not list(client_id):
-    #     client_id = "INSERT INTO clients ("store_name","address","cep","cnpj","client_name","rg","cpf","email")"
-    client_id = db.engine.execute('''
-    with possible_client as (
-        SELECT id from clients
-        WHERE store_name=%(store_name)s AND address=%(address)s AND cep=%(cep)s AND cnpj=%(cnpj)s AND client_name=%(name)s AND rg=%(rg)s AND cpf=%(cpf)s AND email=%(email)s
-    ), i as (
-        INSERT INTO clients (store_name,address,cep,cnpj,client_name,rg,cpf,email)
-            SELECT %(store_name)s, %(address)s, %(cep)s, %(cnpj)s, %(name)s, %(rg)s, %(cpf)s, %(email)s
-            WHERE NOT EXISTS (SELECT 1 FROM possible_client)
-            RETURNING id
-    )
-    select id
-    from i
-    union all
-    select id
-    from possible_client
-     ''', store_name=client_store_name, address=client_address, cep=client_cep, cnpj=client_cnpj, name=client_name, rg=client_rg, cpf=client_cpf, email=client_email).first()[0]
+    clients_args = {
+        "store_name": client_store_name,
+        "address": client_address,
+        "cep": client_cep,
+        "cnpj": client_cnpj,
+        "name": client_name,
+        "rg": client_rg,
+        "cpf": client_cpf,
+        "email": client_email
+    }
+
     db.engine.execute('''
-    WITH upsert as (
-        UPDATE services
-        SET 
-            username=%(username)s,
-            type=%(type_contract)s,
-            days_to_finish=%(deadline)s,
-            total_price=%(price)s,
-            payment_price=%(payment_price)s,
-            payment=%(payment)s,
-            description=%(description)s,
-            client_id=%(client_id)s
-        WHERE
-            username=%(username)s AND
-            type=%(type_contract)s AND
-            days_to_finish=%(deadline)s AND
-            total_price=%(price)s AND
-            payment_price=%(payment_price)s AND
-            payment=%(payment)s AND
-            client_id=%(client_id)s
-        RETURNING *
-    )
+    INSERT INTO clients (store_name,address,cep,cnpj,client_name,rg,cpf,email)
+        SELECT %(store_name)s, %(address)s, %(cep)s, %(cnpj)s, %(name)s, %(rg)s, %(cpf)s, %(email)s
+        WHERE NOT EXISTS (SELECT 1 FROM clients WHERE store_name=%(store_name)s AND address=%(address)s AND cep=%(cep)s AND cnpj=%(cnpj)s AND client_name=%(name)s AND rg=%(rg)s AND cpf=%(cpf)s AND email=%(email)s)
+    ''', **clients_args)
+
+    client_id = db.engine.execute('''
+    SELECT id from clients
+        WHERE store_name=%(store_name)s AND address=%(address)s AND cep=%(cep)s AND cnpj=%(cnpj)s AND client_name=%(name)s AND rg=%(rg)s AND cpf=%(cpf)s AND email=%(email)s
+     ''', **clients_args).first()[0]
+
+    services_args = {
+        "username": session["user_id"],
+        "type_contract": type_contract,
+        "deadline": deadline,
+        "price": price,
+        "payment_price": payment_price,
+        "payment": payment,
+        "description": descriptions,
+        "client_id": client_id
+    }
+
+    db.engine.execute('''
+    UPDATE services
+    SET 
+        username=%(username)s,
+        type=%(type_contract)s,
+        days_to_finish=%(deadline)s,
+        total_price=%(price)s,
+        payment_price=%(payment_price)s,
+        payment=%(payment)s,
+        description=%(description)s,
+        client_id=%(client_id)s
+    WHERE
+        username=%(username)s AND
+        type=%(type_contract)s AND
+        days_to_finish=%(deadline)s AND
+        total_price=%(price)s AND
+        payment_price=%(payment_price)s AND
+        payment=%(payment)s AND
+        client_id=%(client_id)s
+    ''', **services_args)
+
+    db.engine.execute('''
     INSERT INTO services("username", "type", "days_to_finish", "total_price", "payment_price", "payment", "description", "client_id")
         SELECT %(username)s, %(type_contract)s, %(deadline)s, %(price)s, %(payment_price)s, %(payment)s, %(description)s, %(client_id)s
-        WHERE NOT EXISTS(SELECT 1 FROM upsert)
-    ''', username=session["user_id"], type_contract=type_contract, deadline=deadline, price=price, payment_price=payment_price, payment=payment, description=descriptions, client_id=client_id)#, session["user_id"], type_contract, deadline, price, payment_price, payment, client_id, session["user_id"], type_contract, deadline, price, payment_price, payment, descriptions, client_id)
+        WHERE NOT EXISTS(SELECT 1 FROM services WHERE username=%(username)s AND type=%(type_contract)s AND days_to_finish=%(deadline)s AND total_price=%(price)s AND payment_price=%(payment_price)s AND payment=%(payment)s AND client_id=%(client_id)s)
+    ''', **services_args)
     # db.engine.execute('INSERT INTO clients("store_name","address","cep","cnpj","client_name","rg","cpf","email","service_id") VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)', client_store_name, client_address, client_cep, client_cnpj, client_name, client_rg, client_cpf, client_email, id[0])
     return redirect("/generate")
