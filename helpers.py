@@ -1,5 +1,11 @@
 from functools import wraps
 from flask import session, request, redirect, url_for
+from enum import Enum
+
+
+class Roles(Enum):
+    CREATION = "CREATION"
+
 
 def start_db(db):
     commands = ['''
@@ -14,9 +20,16 @@ def start_db(db):
         )
     ''',
     '''
+    CREATE TABLE IF NOT EXISTS roles (
+        id serial primary key,
+        permissions text[]
+    )
+    ''',
+    '''
     CREATE TABLE IF NOT EXISTS users (
         name text not null,
-        password text not null
+        password text not null,
+        role_id integer REFERENCES roles(id) not null
         )
     ''',
         '''
@@ -64,6 +77,14 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if session.get("user_id"):
+            return f(*args, **kwargs)
+        return redirect(url_for('access'))
+    return decorated_function
+
+def creation_role(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if session.get("user_id") and session.get("roles") and Roles.CREATION.name in session["roles"]:
             return f(*args, **kwargs)
         return redirect(url_for('access'))
     return decorated_function

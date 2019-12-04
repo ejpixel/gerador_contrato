@@ -25,19 +25,22 @@ start_db(db)
 def access():
     if request.method == "POST":
         hash = hashlib.sha256(request.form["key"].encode()).hexdigest()
-        result = db.engine.execute("SELECT * FROM users WHERE password = %s", hash).first()
+        result = db.engine.execute("SELECT name, permissions FROM users INNER JOIN roles ON users.role_id=roles.id WHERE password = %s", hash).first()
         if result:
             session["user_id"] = result[0]
+            session["roles"] = result[1]
         return redirect("/")
     return render_template("access.html")
 
 @app.route("/")
 @login_required
+@creation_role
 def index():
     return render_template("index.html")
 
 @app.route("/generate_contract", methods=["GET", "POST"])
 @login_required
+@creation_role
 def generate():
     if request.method == "GET":
         try:
