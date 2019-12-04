@@ -36,7 +36,7 @@ def access():
 def index():
     return render_template("index.html")
 
-@app.route("/generate", methods=["GET", "POST"])
+@app.route("/generate_contract", methods=["GET", "POST"])
 @login_required
 def generate():
     if request.method == "GET":
@@ -127,5 +127,4 @@ def generate():
         SELECT %(username)s, %(type_contract)s, %(deadline)s, %(price)s, %(payment_price)s, %(payment)s, %(description)s, %(client_id)s
         WHERE NOT EXISTS(SELECT 1 FROM services WHERE username=%(username)s AND type=%(type_contract)s AND days_to_finish=%(deadline)s AND total_price=%(price)s AND payment_price=%(payment_price)s AND payment=%(payment)s AND client_id=%(client_id)s)
     ''', **services_args)
-    # db.engine.execute('INSERT INTO clients("store_name","address","cep","cnpj","client_name","rg","cpf","email","service_id") VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)', client_store_name, client_address, client_cep, client_cnpj, client_name, client_rg, client_cpf, client_email, id[0])
-    return redirect("/generate")
+    return redirect("/generate_contract")

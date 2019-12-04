@@ -19,12 +19,16 @@
         <div class="collapse navbar-collapse" id="navbar">
             {% if session.user_id %}
                 <ul class="navbar-nav mr-auto mt-2">
-                    <li class="nav-item"><a class="nav-link" href="/generate_contract">Contract generator</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/contracts_manager">Contracts manager</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/ata_manager">Ata manager</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/access_manager">Access manager</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/clients_manager">Clients manager</a></li>
                 </ul>
             {% endif %}
         </div>
     </nav>
-    <div class="container p-5">
+    <div class="container">
     {% block main %}
     {% endblock %}
     </div>
