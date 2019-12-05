@@ -1,9 +1,11 @@
 $(document).ready(function() {
     $(".edition").hide();
     $(".clickable").attr("edited", "false");
-    $(".clickable").on("click", function(){
-        $(".edition").fadeOut();
-        $(this).next().fadeIn();
+    $(".clickable").mouseenter(function(){
+        $(this).find(".edition").fadeIn(100);
+    })
+    $(".clickable").mouseleave(function(){
+        $(this).find(".edition").fadeOut(100);
     })
     $(".edit").on("click", function () {
         $(this).parent().prev().attr("contenteditable", "true")
@@ -22,4 +24,17 @@ $(document).ready(function() {
           })
         }
     })
+
+    showHideView()
+    function showHideView() {
+        let id = $("#page-view").val()
+        $("#" + id).show()
+        $("#page-view option").each(function(){
+            if ($(this).val() != id) {
+                $("#" + $(this).val()).hide()
+            }
+        })
+    }
+
+    $("#page-view").on("change", showHideView);
 })

@@ -5,6 +5,7 @@ from enum import Enum
 
 class Roles(Enum):
     CREATION = "CREATION"
+    ADMIN = "ADMIN"
 
 
 def start_db(db):
@@ -27,7 +28,7 @@ def start_db(db):
     ''',
     '''
     CREATE TABLE IF NOT EXISTS users (
-        name text not null,
+        name text not null unique,
         password text not null,
         role_id integer REFERENCES roles(id) not null
         )
@@ -73,6 +74,12 @@ def start_db(db):
     for command in commands:
         db.engine.execute(command)
 
+def check_roles(roles, user_roles):
+    for role in roles:
+        if role in user_roles:
+            return True
+    return False
+
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -81,10 +88,13 @@ def login_required(f):
         return redirect(url_for('access'))
     return decorated_function
 
-def creation_role(f):
+def role(f, roles=None):
+    if roles is None:
+        roles = [Roles.ADMIN.name]
+
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if session.get("user_id") and session.get("roles") and Roles.CREATION.name in session["roles"]:
+        if session.get("user_id") and session.get("roles") and check_roles(roles, session["roles"]):
             return f(*args, **kwargs)
         return redirect(url_for('access'))
     return decorated_function

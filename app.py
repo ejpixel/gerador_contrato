@@ -34,13 +34,13 @@ def access():
 
 @app.route("/")
 @login_required
-@creation_role
+@role(roles=[Roles.CREATION.name, Roles.ADMIN.name])
 def index():
     return render_template("index.html")
 
 @app.route("/generate_contract", methods=["GET", "POST"])
 @login_required
-@creation_role
+@role(roles=[Roles.CREATION.name, Roles.ADMIN.name])
 def generate():
     if request.method == "GET":
         try:

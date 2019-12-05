@@ -53,11 +53,28 @@ def clients_manager():
 @app.route("/access_manager")
 @login_required
 def access_manager():
-    accounts = db.engine.execute("SELECT * FROM users")
-    return render_template("access_manager.html", accounts=list(accounts))
+    accounts = db.engine.execute("SELECT name, role_id, permissions FROM users INNER JOIN roles on role_id=id ")
+    roles = db.engine.execute("SELECT * FROM roles")
+    return render_template("access_manager.html", accounts=list(accounts), roles=list(roles))
 
 @app.route("/ata_manager")
 @login_required
 def ata_manager():
     atas = db.engine.execute("SELECT * FROM ej ORDER BY ata_date")
     return render_template("ata_manager.html", atas=list(atas))
+
+@app.route("/access_creation", methods=["POST"])
+@login_required
+def access_creation():
+    name = request.form['username']
+    hash = hashlib.sha256(request.form['password'].encode()).hexdigest()
+    role_id = request.form['role']
+    db.engine.execute("INSERT INTO users(name, password, role_id) VALUES(%(name)s, %(hash)s, %(role)s)", name=name, hash=hash, role=role_id)
+    return redirect(url_for("access_manager"))
+
+@app.route("/role_creation", methods=["POST"])
+@login_required
+def role_creation():
+    permissions = request.form['permissions'].replace(" ", "").split(",")
+    db.engine.execute("INSERT INTO roles(permissions) VALUES(%(p)s)", p=permissions)
+    return redirect(url_for("access_manager"))
