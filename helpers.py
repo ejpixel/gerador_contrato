@@ -1,5 +1,5 @@
 from functools import wraps
-from flask import session, request, redirect, url_for
+from flask import session, request, redirect, url_for, flash
 from enum import Enum
 
 
@@ -96,5 +96,6 @@ def role(f, roles=None):
     def decorated_function(*args, **kwargs):
         if session.get("user_id") and session.get("roles") and check_roles(roles, session["roles"]):
             return f(*args, **kwargs)
+        flash("You don't have permission to see this page")
         return redirect(url_for('access'))
     return decorated_function

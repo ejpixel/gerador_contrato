@@ -16,7 +16,6 @@ $(document).ready(function() {
         $(this).on("input", function(){
             if (temp_saved_text === $(this).text()) {
                 $(this).attr("edited", "false")
-
             }
             else {
                 $(this).attr("edited", "true")
