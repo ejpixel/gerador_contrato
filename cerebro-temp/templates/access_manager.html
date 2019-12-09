@@ -43,11 +43,11 @@ Gerador contrato
         </form>
     </div>
       <div id="accounts-overview">
-            <table class="table table-hover">
+            <table class="table table-hover" id="accounts">
                 <thead>
                     <tr>
                         <th>username</th>
-                        <th>role id</th>
+                        <th class="editable" type="number">role id</th>
                         <th>permissions</th>
                     </tr>
                 </thead>
@@ -65,9 +65,10 @@ Gerador contrato
                     {% endfor %}
                 </tbody>
             </table>
+            <input type="submit" class="save" value="Save">
         </div>
        <div id="roles-overview">
-            <table class="table table-hover">
+            <table class="table table-hover" id="roles">
                 <thead>
                     <tr>
                         <th>id</th>
@@ -88,5 +89,6 @@ Gerador contrato
                     {% endfor %}
                 </tbody>
             </table>
+            <input type="submit" class="save" value="Save">
         </div>
 {% endblock %}

@@ -1,5 +1,12 @@
 from functools import wraps
-from flask import session, request, redirect, url_for
+from flask import session, request, redirect, url_for, flash
+from enum import Enum
+
+
+class Roles(Enum):
+    CREATION = "CREATION"
+    ADMIN = "ADMIN"
+
 
 def start_db(db):
     commands = ['''
@@ -68,3 +75,24 @@ def login_required(f):
             return f(*args, **kwargs)
         return redirect(url_for('access'))
     return decorated_function
+
+def creation_role(f):
+    return role(f, roles=[Roles.CREATION.name])
+
+def admin_role(f):
+    return role(f, roles=[Roles.ADMIN.name])
+
+def role(f, roles):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if session.get("user_id") and session.get("roles") and check_roles(roles, session["roles"]):
+            return f(*args, **kwargs)
+        flash("You don't have permission to see this page")
+        return redirect(url_for('access'))
+    return decorated_function
+
+def check_roles(roles, user_roles):
+    for role in roles:
+        if role in user_roles:
+            return True
+    return False
