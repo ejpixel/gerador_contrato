@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, render_template, request, send_file, redirect, session
+from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy as sql
 import hashlib
 from helpers import *
@@ -110,4 +110,52 @@ def edit_accounts():
             return redirect(url_for("access_manager"))
         db.engine.execute("UPDATE users SET role_id=%s WHERE name=%s", int(req["role id"]), req["username"])
     flash("Success")
+    return redirect(url_for("access_manager"))
+
+
+@app.route("/remove_accounts", methods=["POST"])
+@login_required
+@admin_role
+def remove_accounts():
+    complete_request = json.loads(request.get_data().decode("utf-8"))
+    for req in complete_request:
+        db.engine.execute("DELETE FROM users WHERE name=%s", req["username"])
+    return redirect(url_for("access_manager"))
+
+@app.route("/ata_creation", methods=["POST"])
+@login_required
+@admin_role
+def ata_creation():
+    db.engine.execute("INSERT INTO ej(ata_date, president, president_rg, president_cpf, vice_president, vice_president_rg, vice_president_cpf) VALUES(%s, %s, %s, %s, %s, %s, %s)",
+                      request.form["date"], request.form["president"], request.form["president_rg"], request.form["president_cpf"], request.form["vice_president"], request.form["vice_president_rg"], request.form["vice_president_cpf"])
+    return redirect(url_for("ata_manager"))
+
+@app.route("/remove_ata", methods=["POST"])
+@login_required
+@admin_role
+def remove_ata():
+    complete_request = json.loads(request.get_data().decode("utf-8"))
+    for req in complete_request:
+        db.engine.execute("DELETE FROM ej WHERE ata_date=%s", req["ata_date"])
+    return redirect(url_for("ata_manager"))
+
+@app.route("/edit_clients", methods=["POST"])
+@login_required
+@admin_role
+def edit_clients():
+    complete_request = json.loads(request.get_data().decode("utf-8"))
+    for req in complete_request:
+        old = db.engine.execute("SELECT * FROM clients WHERE id=%s", req["id"]).first()
+        if len(old) == 0:
+            return redirect(url_for("access_manager"))
+        db.engine.execute("UPDATE clients SET store_name=%s, address=%s, cep=%s, cnpj=%s, client_name=%s, rg=%s, cpf=%s, email=%s WHERE id=%s", req["store_name"], req["address"], req["cep"], req["cnpj"], req["client_name"], req["rg"], req["cpf"], req["email"], req["id"])
+    return redirect(url_for("access_manager"))
+
+@app.route("/remove_clients", methods=["POST"])
+@login_required
+@admin_role
+def remove_clients():
+    complete_request = json.loads(request.get_data().decode("utf-8"))
+    for req in complete_request:
+        db.engine.execute("UPDATE clients SET removed=true WHERE id=%s", req["id"])
     return redirect(url_for("access_manager"))

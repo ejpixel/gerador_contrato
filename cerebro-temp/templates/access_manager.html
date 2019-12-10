@@ -8,41 +8,32 @@ Gerador contrato
          <select name="page-view" id="page-view" class="form-control">
              <option value="accounts-overview">Manage accounts</option>
              <option value="roles-overview">Manage roles</option>
-             <option value="new-user-form">Create new user</option>
-             <option value="new-role-form">Create new role</option>
          </select>
      </div>
-    <div id="new-role-form">
-        <form action="/role_creation" method="post">
-            <div class="form-group">
-                <label for="permissions">Permissions</label>
-                <input type="text" id="permissions" name="permissions" placeholder="Permission1, Permission2..." class="form-control">
-            </div>
-            <input type="submit" value="Create role" id="create_role">
-        </form>
-    </div>
-    <div id="new-user-form">
-        <form action="/access_creation" method="post">
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" class="form-control">
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" class="form-control">
-            </div>
-             <div class="form-group">
-                <label for="role" class="text-nowrap">Role</label>
-                <select name="role" id="role" class="form-control">
-                    {% for role in roles %}
-                        <option value="{{ role[0] }}">{{ role[1] }}</option>
-                    {% endfor %}
-                </select>
-             </div>
-            <input type="submit" value="Create user" id="create_user">
-        </form>
-    </div>
       <div id="accounts-overview">
+           <div class="container p-2" id="new-user-form">
+                <form action="/access_creation" method="post">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input type="text" id="username" name="username" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" name="password" class="form-control">
+                        </div>
+                         <div class="form-group">
+                            <label for="role" class="text-nowrap">Role</label>
+                            <select name="role" id="role" class="form-control">
+                                {% for role in roles %}
+                                    <option value="{{ role[0] }}">{{ role[1] }}</option>
+                                {% endfor %}
+                            </select>
+                         </div>
+                    </div>
+                    <input type="submit" value="Create user" id="create_user">
+                </form>
+            </div>
             <table class="table table-hover" id="accounts">
                 <thead>
                     <tr>
@@ -58,8 +49,8 @@ Gerador contrato
                                 <td>{{ data }}</td>
                             {% endfor %}
                             <td class="edition">
-                                <span class="edit">Edit</span>
-                                <span class="remove">Remove</span>
+                                <button class="btn btn-light btn-sm edit">Edit</button>
+                                <button class="btn btn-danger btn-sm remove">Remove</button>
                             </td>
                         </tr>
                     {% endfor %}
@@ -68,11 +59,20 @@ Gerador contrato
             <input type="submit" class="save" value="Save">
         </div>
        <div id="roles-overview">
+               <div class="container p-2">
+                    <form action="/role_creation" method="post">
+                        <div class="form-group">
+                            <label for="permissions">Permissions</label>
+                            <input type="text" id="permissions" name="permissions" placeholder="Permission1, Permission2..." class="form-control">
+                             <input type="submit" value="Create role" id="create_role">
+                        </div>
+                    </form>
+                </div>
             <table class="table table-hover" id="roles">
                 <thead>
                     <tr>
                         <th>id</th>
-                        <th>permissions</th>
+                        <th class="editable" type="text">permissions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -81,10 +81,10 @@ Gerador contrato
                             {% for data in role %}
                                 <td>{{ data }}</td>
                             {% endfor %}
-                        </tr>
-                        <tr class="edition">
-                            <td class="edit">Edit</td>
-                            <td class="remove">Remove</td>
+                            <td class="edition">
+                                <button class="btn btn-light btn-sm edit">Edit</button>
+                                <button class="btn btn-danger btn-sm remove">Remove</button>
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>

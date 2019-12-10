@@ -11,6 +11,7 @@ class Roles(Enum):
 def start_db(db):
     commands = ['''
     CREATE TABLE IF NOT EXISTS ej (
+        id serial primary key,
         ata_date date not null,
         president text not null,
         president_rg text not null,
@@ -21,10 +22,17 @@ def start_db(db):
         )
     ''',
     '''
+    CREATE TABLE IF NOT EXISTS roles (
+        id serial primary key,
+        permissions text[]
+    )
+    ''',
+    '''
     CREATE TABLE IF NOT EXISTS users (
-        name text not null,
+        id serial primary key,
+        name text not null unique,
         password text not null,
-        role_id integer not null default 0
+        role_id integer REFERENCES roles(id) not null
         )
     ''',
         '''
@@ -37,7 +45,8 @@ def start_db(db):
         client_name text not null,
         rg text not null,
         cpf text not null,
-        email text not null
+        email text not null,
+        removed boolean not null default false
         )
     ''',
     '''
@@ -53,7 +62,8 @@ def start_db(db):
         contract_generation_date date not null default now(),
         acceptance_date date,
         first_payment date,
-        client_id integer REFERENCES clients(id) not null
+        client_id integer REFERENCES clients(id) not null,
+        removed boolean not null default false
         )
     ''',
     '''
@@ -96,3 +106,6 @@ def check_roles(roles, user_roles):
         if role in user_roles:
             return True
     return False
+
+def normalize_array(array):
+    return array.replace(" ", "").split(",")

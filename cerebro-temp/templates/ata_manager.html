@@ -1,11 +1,52 @@
  {% extends "layout.html" %}
 {% block title%}
-Gerador contrato
+Ata manager
 {% endblock %}
 
 {% block main %}
      <div id="atas-overview">
-            <table class="table table-hover">
+         <form action="/ata_creation" method="post">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="date">Date</label>
+                    <input type="date" id="date" name="date" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="president">President</label>
+                    <input type="text" id="president" name="president" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="president_rg">President rg</label>
+                    <input type="text" id="president_rg" name="president_rg" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="president_cpf">President cpf</label>
+                    <input type="text" id="president_cpf" name="president_cpf" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="vice_president">Vice president</label>
+                    <input type="text" id="vice_president" name="vice_president" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="vice_president_rg">Vice president rg</label>
+                    <input type="text" id="vice_president_rg" name="vice_president_rg" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="vice_president_cpf">Vice president cpf</label>
+                    <input type="text" id="vice_president_cpf" name="vice_president_cpf" class="form-control">
+                </div>
+
+            </div>
+            <input type="submit" value="Create ata" id="create_ata">
+        </form>
+            <table class="table table-hover" id="ata">
                 <thead>
                     <tr>
                         <th>ata_date</th>
@@ -23,14 +64,13 @@ Gerador contrato
                             {% for data in ata %}
                                 <td>{{ data }}</td>
                             {% endfor %}
-                        </tr>
-                        <tr class="edition">
-                            <td class="edit">Edit</td>
-                            <td class="remove">Remove</td>
+                            <td class="edition">
+                                <button class="btn btn-danger btn-sm remove">Remove</button>
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
+            <input type="submit" class="save" value="Save">
         </div>
-         <input type="submit" id="save" value="Save">
  {% endblock %}
