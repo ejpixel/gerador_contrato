@@ -39,26 +39,44 @@ $(document).ready(function() {
         }
     });
 
+    $(".clickable").on('input', '.float', function() {
+        if (!/^[0-9]+(?:\.[0-9]{1,2})?$/.test($(this).text())) {
+            $(this).text($(this).text().replace(/(?!^[0-9]+(?:\.[0-9]{1,2})?$)/g, ""))
+        }
+    });
+
+    $(".clickable").on('input', '.text', function() {
+        if (!/^[a-zA-Z]+$/.test($(this).text())) {
+            $(this).text($(this).text().replace(/(?!^[a-zA-Z]+$)/g, ""))
+        }
+    });
+
     $(".save").click(function() {
         let modified_list = []
         let removed_list = []
+        let accepted_list = []
         let headers = []
         let target = $(this).prev().attr("id")
         $(this).prev().find("tr > th").each(function() {headers.push($(this).html())});
 
         $("tr").each(function() {
         let tRow = $(this)
-            if (tRow.attr("edited") === "true" || tRow.attr("mark-removed") === "true") {
+            if (tRow.attr("edited") === "true" || tRow.attr("mark-removed") === "true" || tRow.attr("mark-accepted") === "true") {
                 let modified = {};
                 headers.map(function (element, i) {
                     modified[element] = tRow.find(`td:eq(${i})`).html()
                 })
-                if (tRow.attr("edited") === "true") {
+                if (tRow.attr("mark-removed") === "true") {
+                    removed_list.push(modified)
+                }
+
+                else if (tRow.attr("edited") === "true") {
                     modified_list.push(modified)
                 }
 
-                else if (tRow.attr("mark-removed") === "true") {
-                    removed_list.push(modified)
+
+                if (tRow.attr("mark-accepted") === "true") {
+                    accepted_list.push(modified)
                 }
 
             }
@@ -82,6 +100,16 @@ $(document).ready(function() {
                 data: JSON.stringify(removed_list)
             });
         }
+
+        if (accepted_list.length > 0) {
+            $.ajax({
+                type: "POST",
+                contentType: 'application/json; charset=utf-8',
+                dataType: "json",
+                url: "accept" + target,
+                data: JSON.stringify(accepted_list)
+            });
+        }
     })
 
     $(".remove").on("click", function(){
@@ -90,6 +118,16 @@ $(document).ready(function() {
         $(this).next().fadeIn()
     })
 
+    $(".accept").on("click", function(){
+        $(this).parent().find(".delete").each(function(i, e){$(e).fadeOut()})
+        $(this).next().fadeIn()
+        $(this).parent().parent().parent().attr("mark-accepted", "true")
+     '' $(this).parent().parent().css("background-color", "green")
+    })
+
+    $(".add_payment").on("click", function(){
+     '' $(this).parent().parent().parent().append()
+    })
 
     $(".edition").on("click", ".remove-confirmation", function(){
         $(this).parent().parent().parent().attr("mark-removed", "true")

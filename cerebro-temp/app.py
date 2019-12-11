@@ -54,8 +54,13 @@ def logout():
 @login_required
 @admin_role
 def contracts_manager():
-    contracts = db.engine.execute("SELECT * FROM services ORDER BY id")
-    return render_template("contracts_manager.html", contracts=list(contracts))
+    raw_contracts = db.engine.execute("SELECT services.*, count(payments.service_id) FROM services LEFT JOIN payments ON services.id=payments.service_id group by services.id, payments.id")
+    contracts = []
+    for contract in raw_contracts:
+        short_description = contract[7]["short_description"]
+        service_list = contract[7]["service_list"]
+        contracts.append(list(contract[:7]) + [short_description, service_list] + list(contract[8:]))
+    return render_template("contracts_manager.html", contracts=contracts)
 
 @app.route("/clients_manager")
 @login_required
@@ -68,7 +73,7 @@ def clients_manager():
 @login_required
 @admin_role
 def access_manager():
-    raw_accounts = db.engine.execute("SELECT name, role_id, permissions FROM users INNER JOIN roles on role_id=id ")
+    raw_accounts = db.engine.execute("SELECT name, role_id, permissions FROM users INNER JOIN roles on role_id=id")
     accounts = [[name, role, " ".join(permissions)] for name, role, permissions in raw_accounts]
     roles = db.engine.execute("SELECT * FROM roles")
     return render_template("access_manager.html", accounts=list(accounts), roles=list(roles))
@@ -158,4 +163,44 @@ def remove_clients():
     complete_request = json.loads(request.get_data().decode("utf-8"))
     for req in complete_request:
         db.engine.execute("UPDATE clients SET removed=true WHERE id=%s", req["id"])
+    return redirect(url_for("access_manager"))
+
+@app.route("/edit_contracts", methods=["POST"])
+@login_required
+@admin_role
+def edit_contracts():
+    complete_request = json.loads(request.get_data().decode("utf-8"))
+    for req in complete_request:
+        old = db.engine.execute("SELECT * FROM services WHERE id=%s", req["id"]).first()
+        if len(old) == 0:
+            return redirect(url_for("access_manager"))
+        descriptions = json.dumps({"short_description": req["short description"], "service_list": req["service list"]})
+        db.engine.execute("UPDATE services SET type=%s, days_to_finish=%s, total_price=%s, payment_price=%s, payment=%s, description=%s client_id=%s WHERE id=%s", req["type"], req["deadline"], req["price"], req["payment price"], req["payments"], descriptions, req["long description"], req["client id"], req["id"])
+    return redirect(url_for("access_manager"))
+
+@app.route("/accept_contracts", methods=["POST"])
+@login_required
+@admin_role
+def accept_contracts():
+    complete_request = json.loads(request.get_data().decode("utf-8"))
+    for req in complete_request:
+        db.engine.execute("UPDATE services SET acceptance_date=now WHERE id=%s", req["id"])
+    return redirect(url_for("access_manager"))
+
+@app.route("/add_payments_contracts", methods=["POST"])
+@login_required
+@admin_role
+def add_payments_contracts():
+    complete_request = json.loads(request.get_data().decode("utf-8"))
+    for req in complete_request:
+        db.engine.execute("INSERT INTO services(payment, price, service_id) VALUES(%s, %s, %s)", req["payment"], req["price"], req["service_id"])
+    return redirect(url_for("access_manager"))
+
+@app.route("/remove_contracts", methods=["POST"])
+@login_required
+@admin_role
+def remove_contracts():
+    complete_request = json.loads(request.get_data().decode("utf-8"))
+    for req in complete_request:
+        db.engine.execute("UPDATE services SET removed=true WHERE id=%s", req["id"])
     return redirect(url_for("access_manager"))
