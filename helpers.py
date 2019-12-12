@@ -11,6 +11,7 @@ class Roles(Enum):
 def start_db(db):
     commands = ['''
     CREATE TABLE IF NOT EXISTS ej (
+        id serial primary key,
         ata_date date not null,
         president text not null,
         president_rg text not null,
@@ -28,6 +29,7 @@ def start_db(db):
     ''',
     '''
     CREATE TABLE IF NOT EXISTS users (
+        id serial primary key,
         name text not null unique,
         password text not null,
         role_id integer REFERENCES roles(id) not null
@@ -43,7 +45,8 @@ def start_db(db):
         client_name text not null,
         rg text not null,
         cpf text not null,
-        email text not null
+        email text not null,
+        removed boolean not null default false
         )
     ''',
     '''
@@ -59,7 +62,8 @@ def start_db(db):
         contract_generation_date date not null default now(),
         acceptance_date date,
         first_payment date,
-        client_id integer REFERENCES clients(id) not null
+        client_id integer REFERENCES clients(id) not null,
+        removed boolean not null default false
         )
     ''',
     '''
@@ -88,10 +92,13 @@ def login_required(f):
         return redirect(url_for('access'))
     return decorated_function
 
-def role(f, roles=None):
-    if roles is None:
-        roles = [Roles.ADMIN.name]
+def creation_role(f):
+    return role(f, roles=[Roles.CREATION.name])
 
+def admin_role(f):
+    return role(f, roles=[Roles.ADMIN.name])
+
+def role(f, roles):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if session.get("user_id") and session.get("roles") and check_roles(roles, session["roles"]):
@@ -99,3 +106,6 @@ def role(f, roles=None):
         flash("You don't have permission to see this page")
         return redirect(url_for('access'))
     return decorated_function
+
+def normalize_array(array):
+    return array.replace(" ", "").split(",")

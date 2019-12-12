@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, render_template, request, send_file, redirect, session
+from flask import Flask, render_template, request, send_file, redirect, session, get_flashed_messages
 from flask_sqlalchemy import SQLAlchemy as sql
 from profiles import *
 import gerador_contrato
@@ -24,23 +24,33 @@ start_db(db)
 @app.route("/access", methods=["GET", "POST"])
 def access():
     if request.method == "POST":
-        hash = hashlib.sha256(request.form["key"].encode()).hexdigest()
-        result = db.engine.execute("SELECT name, permissions FROM users INNER JOIN roles ON users.role_id=roles.id WHERE password = %s", hash).first()
+        name = request.form["name"]
+        hash_result = hashlib.sha256(request.form["key"].encode()).hexdigest()
+        result = db.engine.execute("SELECT name, permissions FROM users INNER JOIN roles ON users.role_id=roles.id WHERE name = %s AND password = %s", name, hash_result).first()
         if result:
             session["user_id"] = result[0]
             session["roles"] = result[1]
-        return redirect("/")
+            return redirect("/")
+        else:
+            flash("Username or password incorrect")
     return render_template("access.html")
 
 @app.route("/")
 @login_required
-@role(roles=[Roles.CREATION.name, Roles.ADMIN.name])
+@creation_role
 def index():
     return render_template("index.html")
 
+@app.route("/logout")
+@login_required
+def logout():
+    session["user_id"] = None
+    session["roles"] = None
+    return redirect("/")
+
 @app.route("/generate_contract", methods=["GET", "POST"])
 @login_required
-@role(roles=[Roles.CREATION.name, Roles.ADMIN.name])
+@creation_role
 def generate():
     if request.method == "GET":
         try:

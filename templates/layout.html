@@ -17,13 +17,26 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbar">
+            <ul class="navbar-nav mr-auto mt-2">
+                <li class="nav-item"><a class="nav-link" href="/">Contract generator</a></li>
+            </ul>
             {% if session.user_id %}
-                <ul class="navbar-nav mr-auto mt-2">
-                    <li class="nav-item"><a class="nav-link" href="/generate_contract">Contract generator</a></li>
+                <ul class="navbar-nav ml-auto mt-2">
+                    <li class="nav-item"><a class="nav-link" href="/logout">Log out</a></li>
                 </ul>
             {% endif %}
         </div>
     </nav>
+    {% block message %}
+        <div class="container">
+            {% for message in get_flashed_messages() %}
+                <div class="alert alert-warning">
+                    <button type="button" data-dismiss="alert" class="close">&times;</button>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endblock %}
     <div class="container p-5">
     {% block main %}
     {% endblock %}
