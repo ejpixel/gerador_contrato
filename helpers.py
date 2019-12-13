@@ -1,6 +1,8 @@
 from functools import wraps
 from flask import session, request, redirect, url_for, flash
 from enum import Enum
+import datetime
+import sapixel
 
 
 class Roles(Enum):
@@ -109,3 +111,11 @@ def role(f, roles):
 
 def normalize_array(array):
     return array.replace(" ", "").split(",")
+
+def event_new_contract(client_store_name, client_name, short_description):
+    start_date = datetime.datetime.now()
+    end_date = datetime.datetime.now() + datetime.timedelta(days=30)
+    title = f" {client_store_name} de {client_name}"
+    description = " pelo serviço " + short_description
+    model = "accept_contract"
+    sapixel.new_calendar_event_from_model(model_name=model, start_date=start_date, end_date=end_date, title=title, description=description)

@@ -140,4 +140,6 @@ def generate():
         SELECT %(username)s, %(type_contract)s, %(deadline)s, %(price)s, %(payment_price)s, %(payment)s, %(description)s, %(client_id)s
         WHERE NOT EXISTS(SELECT 1 FROM services WHERE username=%(username)s AND type=%(type_contract)s AND days_to_finish=%(deadline)s AND total_price=%(price)s AND payment_price=%(payment_price)s AND payment=%(payment)s AND client_id=%(client_id)s)
     ''', **services_args)
+
+    event_new_contract(client_store_name, client_name, short_description)
     return redirect("/generate_contract")
