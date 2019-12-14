@@ -1,13 +1,10 @@
 from functools import wraps
 from flask import session, request, redirect, url_for, flash
 from enum import Enum
-<<<<<<< HEAD
 from profiles import *
 import json
-=======
 import datetime
 import sapixel
->>>>>>> eaa58d37133273f134c040c3587fb198f279d927
 
 
 class Roles(Enum):
@@ -119,8 +116,6 @@ def role(f, roles):
         return redirect(url_for('access'))
     return decorated_function
 
-<<<<<<< HEAD
-
 def req_to_profiles(req, db):
     type_contract = req.form['type_contract']
     deadline = req.form['deadline']
@@ -144,12 +139,12 @@ def req_to_profiles(req, db):
     client_email = req.form['client_email']
     service = Service(type_contract, deadline, short_description, price, payment, payment_price, short_service_list)
     client = Client(client_name, client_store_name, client_rg, client_cpf, client_cnpj, client_street, client_number, client_neighborhood, client_city, client_state, client_country, client_cep, client_email)
-    current_ej = db.engine.execute("SELECT * FROM ej ORDER BY ata_date limit 1").first()
+    current_ej = db.engine.execute("SELECT ata_date, president, president_rg, president_cpf, vice_president, vice_president_rg, vice_president_cpf FROM ej ORDER BY ata_date limit 1").first()
     ej = EJ(*current_ej)
     return service, client, ej
 
 
-def update_data(service, client, ej, db):
+def update_data(service, client, db):
     descriptions = json.dumps({"short_description": service.short_service_description, "service_list": service.service_list})
     clients_args = {
         "store_name": client.store.name,
@@ -201,7 +196,6 @@ def update_data(service, client, ej, db):
         description = %(description)s,
         client_id = %(client_id)s
     WHERE
-        username=%(username)s AND
         type=%(type_contract)s AND
         days_to_finish=%(deadline)s AND
         total_price=%(price)s AND
@@ -215,15 +209,14 @@ def update_data(service, client, ej, db):
         SELECT %(username)s, %(type_contract)s, %(deadline)s, %(price)s, %(payment_price)s, %(payment)s, %(description)s, %(client_id)s
         WHERE NOT EXISTS(SELECT 1 FROM services WHERE username=%(username)s AND type=%(type_contract)s AND days_to_finish=%(deadline)s AND total_price=%(price)s AND payment_price=%(payment_price)s AND payment=%(payment)s AND client_id=%(client_id)s)
     ''', **services_args)
-=======
+
 def normalize_array(array):
     return array.replace(" ", "").split(",")
 
 def event_new_contract(client_store_name, client_name, short_description):
-    start_date = datetime.datetime.now()
+    start_date = datetime.datetime.now() + datetime.timedelta(days=30)
     end_date = datetime.datetime.now() + datetime.timedelta(days=30)
     title = f" {client_store_name} de {client_name}"
     description = " pelo serviço " + short_description
     model = "accept_contract"
     sapixel.new_calendar_event_from_model(model_name=model, start_date=start_date, end_date=end_date, title=title, description=description)
->>>>>>> eaa58d37133273f134c040c3587fb198f279d927

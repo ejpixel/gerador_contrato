@@ -1,7 +1,6 @@
 from docxtpl import DocxTemplate
 from profiles import *
 import sys
-import os
 from number_to_word.number_to_word import convert_to_word
 
 TEMPLATE = "template.docx"
@@ -86,7 +85,7 @@ def get_fem_gender_flexion(word_number):
     return word_number
 
 def gen_contract(template, info, output):
-    contract_template = DocxTemplate(template)
+    contract_template = DocxTemplate("./" + template)
     contract_template.render(info)
     contract_template.save(output)
 

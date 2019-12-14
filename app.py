@@ -5,7 +5,6 @@ from flask_sqlalchemy import SQLAlchemy as sql
 import gerador_contrato
 import hashlib
 from helpers import *
-import json
 
 app = Flask(__name__)
 
@@ -47,10 +46,11 @@ def logout():
     session["roles"] = None
     return redirect("/")
 
+
 @app.route("/generate_contract", methods=["GET", "POST"])
 @login_required
 @creation_role
-def generate():
+def generate_contract():
     if request.method == "GET":
         try:
             open(gerador_contrato.OUTPUT).close()
@@ -58,7 +58,13 @@ def generate():
             return redirect("/")
         return send_file(gerador_contrato.OUTPUT, mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document", as_attachment=True, attachment_filename=gerador_contrato.OUTPUT)
     service, client, ej = req_to_profiles(request, db)
+    if not client.client.cpf or (not client.store.cnpj and not client.client.cpf):
+        flash("CPF and CNPJ (if pj) is necessary to create a contract. Check if cpf has 11 digits or cnpj has 14 digits and both are just numbers")
+        return redirect("/")
+
+    update_data(service, client, db)
     info = gerador_contrato.gen_info(service, client, ej)
     gerador_contrato.gen_contract(gerador_contrato.TEMPLATE, info, gerador_contrato.OUTPUT)
+    event_new_contract(client.store.name, client.client.name, service.short_service_description)
 
     return redirect("/generate_contract")

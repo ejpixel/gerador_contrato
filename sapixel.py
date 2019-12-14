@@ -7,8 +7,8 @@ ONE_WEEK_IN_MINUTES = int(datetime.timedelta(days=7).total_seconds() / 60)
 ONE_DAY_IN_MINUTES = int(datetime.timedelta(days=1).total_seconds() / 60)
 TZ = "America/Sao_Paulo"
 SCOPES = ['https://www.googleapis.com/auth/calendar']
-SERVICE_ACCOUNT_FILE = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
-CALENDAR_ID = os.getenv("CALENDAR_ID")
+SERVICE_ACCOUNT_FILE = os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
+CALENDAR_ID = os.environ["CALENDAR_ID"]
 
 models = {
     "accept_contract": {
@@ -25,9 +25,8 @@ models = {
         'reminders': {
             'useDefault': False,
             'overrides': [
-                {'method': 'popup', 'minutes': ONE_WEEK_IN_MINUTES},
-                {'method': 'popup', 'minutes': 2 * ONE_DAY_IN_MINUTES},
-                {'method': 'popup', 'minutes': ONE_DAY_IN_MINUTES}
+                {'method': 'email', 'minutes': ONE_WEEK_IN_MINUTES},
+                {'method': 'email', 'minutes': ONE_DAY_IN_MINUTES}
             ],
         },
     }

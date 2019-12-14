@@ -51,6 +51,10 @@ class Client:
         self.cep = cep
         self.email = email
 
+    @property
+    def address(self):
+        return f"{self.street}, {self.number} - {self.neighborhood}, {self.city}, {self.state}"
+
 
 class EJ:
 
