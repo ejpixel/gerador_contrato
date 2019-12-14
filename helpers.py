@@ -165,12 +165,12 @@ def update_data(service, client, db):
     db.engine.execute('''
     INSERT INTO clients (store_name, street, number, neighborhood, city, state, country, cep, cnpj, client_name, rg, cpf, email)
         SELECT %(store_name)s, %(street)s, %(number)s, %(neighborhood)s, %(city)s, %(state)s, %(country)s, %(cep)s, %(cnpj)s, %(name)s, %(rg)s, %(cpf)s, %(email)s
-        WHERE NOT EXISTS (SELECT 1 FROM clients WHERE store_name=%(store_name)s AND street=%(street)s AND number=%(number)s AND neighborhood=%(neighborhood)s AND city=%(city)s AND state=%(state)s AND country=%(country)s AND cep=%(cep)s AND cnpj=%(cnpj)s AND client_name=%(name)s AND rg=%(rg)s AND cpf=%(cpf)s AND email=%(email)s)
+        WHERE NOT EXISTS (SELECT 1 FROM clients WHERE store_name=%(store_name)s AND street=%(street)s AND number=%(number)s AND neighborhood=%(neighborhood)s AND city=%(city)s AND state=%(state)s AND country=%(country)s AND cep=%(cep)s AND client_name=%(name)s AND rg=%(rg)s AND cpf=%(cpf)s AND email=%(email)s)
     ''', **clients_args)
 
     client_id = db.engine.execute('''
     SELECT id from clients
-        WHERE store_name=%(store_name)s AND street=%(street)s AND number=%(number)s AND neighborhood=%(neighborhood)s AND city=%(city)s AND state=%(state)s AND country=%(country)s AND cep=%(cep)s AND cnpj=%(cnpj)s AND client_name=%(name)s AND rg=%(rg)s AND cpf=%(cpf)s AND email=%(email)s
+        WHERE store_name=%(store_name)s AND street=%(street)s AND number=%(number)s AND neighborhood=%(neighborhood)s AND city=%(city)s AND state=%(state)s AND country=%(country)s AND cep=%(cep)s AND client_name=%(name)s AND rg=%(rg)s AND cpf=%(cpf)s AND email=%(email)s
      ''', **clients_args).first()[0]
 
     services_args = {
