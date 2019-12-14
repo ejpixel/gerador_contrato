@@ -39,10 +39,17 @@ class Entity:
 
 class Client:
 
-    def __init__(self, name, store_name, rg, cpf, cnpj, address):
+    def __init__(self, name, store_name, rg, cpf, cnpj, street, number, neighborhood, city, state, country, cep, email):
         self.client = Entity(name=name, rg=rg, cpf=cpf)
         self.store = Entity(name=store_name, cnpj=cnpj)
-        self.address = address
+        self.street = street
+        self.number = number
+        self.neighborhood = neighborhood
+        self.city = city
+        self.state = state
+        self.country = country
+        self.cep = cep
+        self.email = email
 
 
 class EJ:
@@ -63,4 +70,3 @@ class Service:
         self.payment = payment
         self.payment_price = payment_price 
         self.service_list = service_list
-        print(service_list)
