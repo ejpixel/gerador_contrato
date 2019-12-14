@@ -1,8 +1,13 @@
 from functools import wraps
 from flask import session, request, redirect, url_for, flash
 from enum import Enum
+<<<<<<< HEAD
 from profiles import *
 import json
+=======
+import datetime
+import sapixel
+>>>>>>> eaa58d37133273f134c040c3587fb198f279d927
 
 
 class Roles(Enum):
@@ -13,6 +18,7 @@ class Roles(Enum):
 def start_db(db):
     commands = ['''
     CREATE TABLE IF NOT EXISTS ej (
+        id serial primary key,
         ata_date date not null,
         president text not null,
         president_rg text not null,
@@ -30,6 +36,7 @@ def start_db(db):
     ''',
     '''
     CREATE TABLE IF NOT EXISTS users (
+        id serial primary key,
         name text not null unique,
         password text not null,
         role_id integer REFERENCES roles(id) not null
@@ -50,7 +57,8 @@ def start_db(db):
         client_name text not null,
         rg text not null,
         cpf text not null,
-        email text not null
+        email text not null,
+        removed boolean not null default false
         )
     ''',
     '''
@@ -66,7 +74,8 @@ def start_db(db):
         contract_generation_date date not null default now(),
         acceptance_date date,
         first_payment date,
-        client_id integer REFERENCES clients(id) not null
+        client_id integer REFERENCES clients(id) not null,
+        removed boolean not null default false
         )
     ''',
     '''
@@ -95,10 +104,13 @@ def login_required(f):
         return redirect(url_for('access'))
     return decorated_function
 
-def role(f, roles=None):
-    if roles is None:
-        roles = [Roles.ADMIN.name]
+def creation_role(f):
+    return role(f, roles=[Roles.CREATION.name])
 
+def admin_role(f):
+    return role(f, roles=[Roles.ADMIN.name])
+
+def role(f, roles):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if session.get("user_id") and session.get("roles") and check_roles(roles, session["roles"]):
@@ -107,6 +119,7 @@ def role(f, roles=None):
         return redirect(url_for('access'))
     return decorated_function
 
+<<<<<<< HEAD
 
 def req_to_profiles(req, db):
     type_contract = req.form['type_contract']
@@ -202,3 +215,15 @@ def update_data(service, client, ej, db):
         SELECT %(username)s, %(type_contract)s, %(deadline)s, %(price)s, %(payment_price)s, %(payment)s, %(description)s, %(client_id)s
         WHERE NOT EXISTS(SELECT 1 FROM services WHERE username=%(username)s AND type=%(type_contract)s AND days_to_finish=%(deadline)s AND total_price=%(price)s AND payment_price=%(payment_price)s AND payment=%(payment)s AND client_id=%(client_id)s)
     ''', **services_args)
+=======
+def normalize_array(array):
+    return array.replace(" ", "").split(",")
+
+def event_new_contract(client_store_name, client_name, short_description):
+    start_date = datetime.datetime.now()
+    end_date = datetime.datetime.now() + datetime.timedelta(days=30)
+    title = f" {client_store_name} de {client_name}"
+    description = " pelo serviço " + short_description
+    model = "accept_contract"
+    sapixel.new_calendar_event_from_model(model_name=model, start_date=start_date, end_date=end_date, title=title, description=description)
+>>>>>>> eaa58d37133273f134c040c3587fb198f279d927

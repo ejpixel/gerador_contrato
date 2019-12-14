@@ -27,8 +27,3 @@ $(document).ready(function() {
     $("#payment").on("input", calculatePaymentPrice);
     $("#price").on("input", calculatePaymentPrice);
 })
-
-// $("#generate_contract").click(function() {
-//     $("#payment_price").attr("type", "text");
-//     $("#payment_price").val($("#payment_price").val().replace(".", ","));
-// })
