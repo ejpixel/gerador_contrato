@@ -82,6 +82,18 @@ def start_db(db):
         price float not null,
         service_id integer REFERENCES services(id)
     )
+    ''',
+    '''
+    CREATE TABLE IF NOT EXISTS service_payment_data (
+        id serial primary key,
+        service_id integer REFERENCES services(id) not null,
+        aliquota float not null,
+        cst integer not null,
+        cnae integer not null,
+        cfps integer not null,
+        aedf integer not null,
+        baseCalcSubst integer not null
+    )
     '''
     ]
     for command in commands:
