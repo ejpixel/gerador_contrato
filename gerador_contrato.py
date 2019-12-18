@@ -1,7 +1,6 @@
 from docxtpl import DocxTemplate
 from profiles import *
 import sys
-import os
 from number_to_word.number_to_word import convert_to_word
 
 TEMPLATE = "template.docx"
@@ -21,7 +20,7 @@ def gen_info(service, client, ej):
         "price_currency":            get_correct_number_flexion(service.price, "real", "reais"),
         "cursive_payment":           get_fem_gender_flexion(convert_to_word(service.payment)),
         "payment_price":             service.payment_price,
-        "cursive_payment_price":     convert_to_word(service.payment_price),
+        "cursive_payment_price":     convert_float(service.payment_price),
         "payment_currency":          get_correct_number_flexion(service.payment_price, "real", "reais"),
         "service_list":              service.service_list,
         "client_store_name":         client.store.name.upper(),
@@ -39,6 +38,20 @@ def gen_info(service, client, ej):
         "pixel_gi_cpf":              ej.gi.get_formated_cpf()
 }
     return contract_info
+
+def convert_float(price):
+    number_as_list = str(price).split(".")
+    if len(number_as_list) == 2:
+        first_number = int(number_as_list[0])
+        second_number = int(number_as_list[1])
+        before_comma = convert_to_word(first_number)
+        after_comma = convert_to_word(second_number)
+        if second_number != 0:
+            return f"{first_number} ({before_comma}) {get_correct_number_flexion(first_number, 'real', 'reais')} e {second_number} ({after_comma}) {get_correct_number_flexion(second_number, 'centavo', 'centavos')}"
+    else:
+        first_number = int(number_as_list[0])
+        before_comma = convert_to_word(first_number)
+    return f"{first_number} ({before_comma}) {get_correct_number_flexion(first_number, 'real', 'reais')}"
 
 def format_date(date_iso_format):
     date_list = str(date_iso_format).split("-")
@@ -60,7 +73,7 @@ def format_date(date_iso_format):
     return f"{'primeiro' if date_list[2] == '01' else convert_to_word(date_list[2])} de {months[date_list[1]]} de {date_list[0]}"
 
 def get_correct_number_flexion(number, singular, plural):
-    if number == "1":
+    if number == "1" or number == 1:
         return singular
     return plural
 
@@ -72,7 +85,7 @@ def get_fem_gender_flexion(word_number):
     return word_number
 
 def gen_contract(template, info, output):
-    contract_template = DocxTemplate(template)
+    contract_template = DocxTemplate("./" + template)
     contract_template.render(info)
     contract_template.save(output)
 
