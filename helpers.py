@@ -98,7 +98,7 @@ def start_db(db):
     ]
     for command in commands:
         db.engine.execute(command)
-l
+
 def check_roles(roles, user_roles):
     for role in roles:
         if role in user_roles:
