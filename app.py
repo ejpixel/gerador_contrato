@@ -17,12 +17,12 @@ except KeyError:
     raise ValueError("É necessário definir variável de ambiente DATABASE_URI com a chave de acesso do banco de dados.")
 
 db = sql(app)
-start_db(db)
 
 env = os.getenv("CEREBRO_ENV", "prod") if os.getenv("CEREBRO_ENV", "prod") in ["dev", "prod"] else "dev"
 
 @app.before_request
 def before_request():
+    start_db(db)
     if not request.is_secure and env == "prod":
         app.config["SESSION_COOKIE_SECURE"] = True
         url = request.url.replace('http://', 'https://', 1)

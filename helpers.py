@@ -92,13 +92,14 @@ def start_db(db):
         cnae integer not null,
         cfps integer not null,
         aedf integer not null,
-        baseCalcSubst integer not null
+        baseCalcSubst integer not null,
+        codm integer not null
     )
     '''
     ]
     for command in commands:
         db.engine.execute(command)
-l
+
 def check_roles(roles, user_roles):
     for role in roles:
         if role in user_roles:
