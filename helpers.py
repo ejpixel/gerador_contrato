@@ -92,7 +92,8 @@ def start_db(db):
         cnae integer not null,
         cfps integer not null,
         aedf integer not null,
-        baseCalcSubst integer not null
+        baseCalcSubst integer not null,
+        codm integer not null
     )
     '''
     ]
